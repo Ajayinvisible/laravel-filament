@@ -9,7 +9,9 @@ use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -38,17 +40,32 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')->required(),
-                TextInput::make('slug')->required(),
-                Select::make('category_id')
-                    ->label('Category')
-                    ->options(Category::all()->pluck('name', 'id')),
-                ColorPicker::make('color')->required(),
-                MarkdownEditor::make('content')->required(),
-                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails'),
-                TagsInput::make('tags')->required(),
-                Toggle::make('published')->required(),
-            ]);
+                Section::make('Create News Post')
+                    ->description('Only Genuine Source News')
+                    ->schema([
+                        Select::make('category_id')
+                            ->label('Category')
+                            ->options(Category::all()->pluck('name', 'id')),
+                        TextInput::make('title')->required(),
+                        TextInput::make('slug')->required(),
+                        ColorPicker::make('color')->required(),
+                        MarkdownEditor::make('content')->required()->columnSpanFull(),
+                    ])->columnSpan(2)->columns(2),
+                Group::make()->schema([
+                    Section::make('Post Thumbnail')
+                        ->description('Post Thumbnail & Images')
+                        ->collapsible()
+                        ->schema([
+                            FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->columnSpan('full'),
+                        ])->columnSpan(1)->columns(1),
+                    section::make('Meta, Tags & Publish')
+                        ->description('Post Publish & Tags related')
+                        ->schema([
+                            TagsInput::make('tags')->required(),
+                            Toggle::make('published')->required()->inline(false),
+                        ])
+                ]),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
