@@ -46,8 +46,8 @@ class PostResource extends Resource
                         Select::make('category_id')
                             ->label('Category')
                             ->options(Category::all()->pluck('name', 'id')),
-                        TextInput::make('title')->required(),
-                        TextInput::make('slug')->required(),
+                        TextInput::make('title')->rules('min:3|max:160')->required(),
+                        TextInput::make('slug')->unique(ignoreRecord: true)->required(),
                         ColorPicker::make('color')->required(),
                         MarkdownEditor::make('content')->required()->columnSpanFull(),
                     ])->columnSpan(2)->columns(2),
@@ -56,13 +56,18 @@ class PostResource extends Resource
                         ->description('Post Thumbnail & Images')
                         ->collapsible()
                         ->schema([
-                            FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->columnSpan('full'),
+                            FileUpload::make('thumbnail')
+                                ->disk('public')
+                                ->directory('thumbnails')
+                                ->columnSpan('full')
+                                ->rules('image|mimes:png,jpg,jpeg,gif')
+                                ->fileRules(['max:2048']),
                         ])->columnSpan(1)->columns(1),
                     section::make('Meta, Tags & Publish')
                         ->description('Post Publish & Tags related')
                         ->schema([
                             TagsInput::make('tags')->required(),
-                            Toggle::make('published')->required()->inline(false),
+                            Toggle::make('published')->inline(false),
                         ])
                 ]),
             ])->columns(3);
