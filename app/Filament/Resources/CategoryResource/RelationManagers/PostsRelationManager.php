@@ -1,11 +1,7 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
-use App\Filament\Resources\PostResource\Pages;
-use App\Filament\Resources\PostResource\RelationManagers;
-use App\Models\Category;
-use App\Models\Post;
 use Filament\Forms;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -17,37 +13,23 @@ use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Columns\ColorColumn;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Nette\Utils\ImageColor;
 
-class PostResource extends Resource
+class PostsRelationManager extends RelationManager
 {
-    protected static ?string $model = Post::class;
+    protected static string $relationship = 'posts';
 
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
-
-    protected static ?string $modelLabel = 'Manage Post';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make('Create News Post')
                     ->description('Only Genuine Source News')
                     ->schema([
-                        Select::make('category_id')
-                            ->label('Category')
-                            // ->searchable() // for large data collection
-                            // ->options(Category::all()->pluck('name', 'id')),  // bad practice
-                            ->relationship('category','name'),
                         TextInput::make('title')->rules('min:3|max:160')->required(),
                         TextInput::make('slug')->unique(ignoreRecord: true)->required(),
                         ColorPicker::make('color')->required(),
@@ -74,22 +56,21 @@ class PostResource extends Resource
             ])->columns(3);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('title')
             ->columns([
-                TextColumn::make('id')->label('S.n')->sortable(),
-                ImageColumn::make('thumbnail'),
-                ColorColumn::make('color')->toggleable(),
-                TextColumn::make('title')->sortable()->searchable(),
-                TextColumn::make('category.name')->sortable()->searchable(),
-                TextColumn::make('tags')->sortable()->searchable()->toggleable(),
-                ToggleColumn::make('published'),
-                TextColumn::make('created_at')->label('publish on')->date()
-                ->sortable()->searchable()->toggleable()
+                Tables\Columns\ImageColumn::make('thumbnail'),
+                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('slug'),
+                Tables\Columns\ToggleColumn::make('published'),
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -100,21 +81,5 @@ class PostResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListPosts::route('/'),
-            'create' => Pages\CreatePost::route('/create'),
-            'edit' => Pages\EditPost::route('/{record}/edit'),
-        ];
     }
 }
