@@ -61,7 +61,6 @@ class PostResource extends Resource
                                 ->directory('thumbnails')
                                 ->columnSpan('full')
                                 ->rules('image|mimes:png,jpg,jpeg,gif')
-                                ->fileRules(['max:2048']),
                         ])->columnSpan(1)->columns(1),
                     section::make('Meta, Tags & Publish')
                         ->description('Post Publish & Tags related')
@@ -77,18 +76,22 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('id')->label('S.n')->sortable(),
                 ImageColumn::make('thumbnail'),
-                ColorColumn::make('color'),
-                TextColumn::make('title'),
-                TextColumn::make('category.name'),
-                TextColumn::make('tags'),
-                ToggleColumn::make('published')
+                ColorColumn::make('color')->toggleable(),
+                TextColumn::make('title')->sortable()->searchable(),
+                TextColumn::make('category.name')->sortable()->searchable(),
+                TextColumn::make('tags')->sortable()->searchable()->toggleable(),
+                ToggleColumn::make('published'),
+                TextColumn::make('created_at')->label('publish on')->date()
+                ->sortable()->searchable()->toggleable()
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
