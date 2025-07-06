@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Post extends Model
 {
@@ -22,8 +23,13 @@ class Post extends Model
         'tags' => 'array', // optional if you retrieve it as array
     ];
 
-    public function category() :BelongsTo
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function authors(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class,'post_user')->withPivot(['order'])->withTimestamps();
     }
 }

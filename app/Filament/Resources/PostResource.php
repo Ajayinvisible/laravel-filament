@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
+use App\Filament\Resources\PostResource\RelationManagers\AuthorsRelationManager;
 use App\Models\Category;
 use App\Models\Post;
 use Filament\Forms;
@@ -47,7 +48,7 @@ class PostResource extends Resource
                             ->label('Category')
                             // ->searchable() // for large data collection
                             // ->options(Category::all()->pluck('name', 'id')),  // bad practice
-                            ->relationship('category','name'),
+                            ->relationship('category', 'name'),
                         TextInput::make('title')->rules('min:3|max:160')->required(),
                         TextInput::make('slug')->unique(ignoreRecord: true)->required(),
                         ColorPicker::make('color')->required(),
@@ -69,7 +70,13 @@ class PostResource extends Resource
                         ->schema([
                             TagsInput::make('tags')->required(),
                             Toggle::make('published')->inline(false),
-                        ])
+                        ]),
+                    // section::make('Authors')->schema([
+                    //     Select::make('authors')
+                    //     ->label('Co Author')
+                    //     ->multiple()
+                    //     ->relationship('authors','name')
+                    // ])
                 ]),
             ])->columns(3);
     }
@@ -86,7 +93,7 @@ class PostResource extends Resource
                 TextColumn::make('tags')->sortable()->searchable()->toggleable(),
                 ToggleColumn::make('published'),
                 TextColumn::make('created_at')->label('publish on')->date()
-                ->sortable()->searchable()->toggleable()
+                    ->sortable()->searchable()->toggleable()
             ])
             ->filters([
                 //
@@ -105,7 +112,7 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AuthorsRelationManager::class
         ];
     }
 
