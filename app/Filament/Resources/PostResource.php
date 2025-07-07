@@ -14,11 +14,14 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -41,44 +44,75 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Create News Post')
-                    ->description('Only Genuine Source News')
+                Tabs::make('Create New Post')->tabs([
+                    Tab::make('Post')
+                    ->icon('heroicon-o-newspaper')
+                    ->iconPosition(IconPosition::After)
                     ->schema([
                         Select::make('category_id')
                             ->label('Category')
-                            // ->searchable() // for large data collection
-                            // ->options(Category::all()->pluck('name', 'id')),  // bad practice
                             ->relationship('category', 'name'),
                         TextInput::make('title')->rules('min:3|max:160')->required(),
                         TextInput::make('slug')->unique(ignoreRecord: true)->required(),
                         ColorPicker::make('color')->required(),
+                    ])->columns(2),
+                    Tab::make('Content')->schema([
                         MarkdownEditor::make('content')->required()->columnSpanFull(),
-                    ])->columnSpan(2)->columns(2),
-                Group::make()->schema([
-                    Section::make('Post Thumbnail')
-                        ->description('Post Thumbnail & Images')
-                        ->collapsible()
-                        ->schema([
-                            FileUpload::make('thumbnail')
-                                ->disk('public')
-                                ->directory('thumbnails')
-                                ->columnSpan('full')
-                                ->rules('image|mimes:png,jpg,jpeg,gif')
-                        ])->columnSpan(1)->columns(1),
-                    section::make('Meta, Tags & Publish')
-                        ->description('Post Publish & Tags related')
-                        ->schema([
-                            TagsInput::make('tags')->required(),
-                            Toggle::make('published')->inline(false),
-                        ]),
-                    // section::make('Authors')->schema([
-                    //     Select::make('authors')
-                    //     ->label('Co Author')
-                    //     ->multiple()
-                    //     ->relationship('authors','name')
-                    // ])
+                    ]),
+                    Tab::make('Image')->schema([
+                        FileUpload::make('thumbnail')
+                            ->disk('public')
+                            ->directory('thumbnails')
+                            ->columnSpan('full')
+                            ->rules('image|mimes:png,jpg,jpeg,gif')
+                    ]),
+                    Tab::make('Meta')->schema([
+                        TagsInput::make('tags')->required(),
+                        Toggle::make('published')->inline(false),
+                        Select::make('authors')
+                            ->label('Co Author')
+                            ->multiple()
+                            ->relationship('authors', 'name')
+                    ]),
                 ]),
-            ])->columns(3);
+                // Section::make('Create News Post')
+                //     ->description('Only Genuine Source News')
+                //     ->schema([
+                //         Select::make('category_id')
+                //             ->label('Category')
+                //             // ->searchable() // for large data collection
+                //             // ->options(Category::all()->pluck('name', 'id')),  // bad practice
+                //             ->relationship('category', 'name'),
+                //         TextInput::make('title')->rules('min:3|max:160')->required(),
+                //         TextInput::make('slug')->unique(ignoreRecord: true)->required(),
+                //         ColorPicker::make('color')->required(),
+                //         MarkdownEditor::make('content')->required()->columnSpanFull(),
+                //     ])->columnSpan(2)->columns(2),
+                // Group::make()->schema([
+                //     Section::make('Post Thumbnail')
+                //         ->description('Post Thumbnail & Images')
+                //         ->collapsible()
+                //         ->schema([
+                //             FileUpload::make('thumbnail')
+                //                 ->disk('public')
+                //                 ->directory('thumbnails')
+                //                 ->columnSpan('full')
+                //                 ->rules('image|mimes:png,jpg,jpeg,gif')
+                //         ])->columnSpan(1)->columns(1),
+                //     section::make('Meta, Tags & Publish')
+                //         ->description('Post Publish & Tags related')
+                //         ->schema([
+                //             TagsInput::make('tags')->required(),
+                //             Toggle::make('published')->inline(false),
+                //         ]),
+                // section::make('Authors')->schema([
+                //     Select::make('authors')
+                //     ->label('Co Author')
+                //     ->multiple()
+                //     ->relationship('authors','name')
+                // ])
+                // ]),
+            ])->columns(1);
     }
 
     public static function table(Table $table): Table
