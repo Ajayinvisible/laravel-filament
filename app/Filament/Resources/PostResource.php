@@ -27,6 +27,9 @@ use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -46,16 +49,16 @@ class PostResource extends Resource
             ->schema([
                 Tabs::make('Create New Post')->tabs([
                     Tab::make('Post')
-                    ->icon('heroicon-o-newspaper')
-                    ->iconPosition(IconPosition::After)
-                    ->schema([
-                        Select::make('category_id')
-                            ->label('Category')
-                            ->relationship('category', 'name'),
-                        TextInput::make('title')->rules('min:3|max:160')->required(),
-                        TextInput::make('slug')->unique(ignoreRecord: true)->required(),
-                        ColorPicker::make('color')->required(),
-                    ])->columns(2),
+                        ->icon('heroicon-o-newspaper')
+                        ->iconPosition(IconPosition::After)
+                        ->schema([
+                            Select::make('category_id')
+                                ->label('Category')
+                                ->relationship('category', 'name'),
+                            TextInput::make('title')->rules('min:3|max:160')->required(),
+                            TextInput::make('slug')->unique(ignoreRecord: true)->required(),
+                            ColorPicker::make('color')->required(),
+                        ])->columns(2),
                     Tab::make('Content')->schema([
                         MarkdownEditor::make('content')->required()->columnSpanFull(),
                     ]),
@@ -130,7 +133,23 @@ class PostResource extends Resource
                     ->sortable()->searchable()->toggleable()
             ])
             ->filters([
-                //
+                // Filter::make('Published Post')->query(function (Builder $query): Builder {
+                //     return $query->where('published', true);
+                // }),
+                // Filter::make('UnPublished Post')->query(function (Builder $query): Builder {
+                //     return $query->where('published', false);
+                // }),
+                TernaryFilter::make('published'),
+                SelectFilter::make('category_id')
+                    ->label('Category')
+                    // ->options(
+                    //     Category::all()
+                    //         ->pluck('name', 'id')
+                    // ) // bad practice
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload()
+                // ->multiple()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
