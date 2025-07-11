@@ -24,11 +24,11 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 
-    protected static ?string $navigationGroup = 'Blog';
-
     protected static ?string $modelLabel = 'Manage Category';
 
     protected static ?int $navigationSort = 2;
+
+    protected static ?string $navigationParentItem = 'Manage Posts';
 
     public static function form(Form $form): Form
     {
