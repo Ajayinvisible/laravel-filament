@@ -28,6 +28,8 @@ class CategoryResource extends Resource
 
     protected static ?string $modelLabel = 'Manage Category';
 
+    protected static ?int $navigationSort = 2;
+
     public static function form(Form $form): Form
     {
         return $form
