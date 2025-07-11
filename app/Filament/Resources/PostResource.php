@@ -45,6 +45,8 @@ class PostResource extends Resource
     protected static ?string $modelLabel = 'Manage Post';
     
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $navigationGroup = 'Manage Blog';
     
     public static function form(Form $form): Form
     {

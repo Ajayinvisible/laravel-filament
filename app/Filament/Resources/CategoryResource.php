@@ -30,6 +30,8 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationParentItem = 'Manage Posts';
 
+    protected static ?string $navigationGroup = 'Manage Blog';
+
     public static function form(Form $form): Form
     {
         return $form
