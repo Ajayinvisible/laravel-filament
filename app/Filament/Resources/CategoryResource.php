@@ -15,6 +15,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Laravel\Prompts\FormStep;
+use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
 {
@@ -28,7 +30,14 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->required(),
+                TextInput::make('name')->required()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function (string $operation, string $state, Forms\Set $set) {
+                        if($operation == 'edit'){
+                            return;
+                        }
+                        $set('slug', Str::slug($state));
+                    }),
                 TextInput::make('slug')->required()
             ]);
     }
@@ -41,10 +50,10 @@ class CategoryResource extends Resource
                 TextColumn::make('name'),
                 TextColumn::make('slug'),
                 TextColumn::make('posts_count')
-                ->label('Ttal Posts')
-                ->counts('posts')
-                ->sortable()
-                ->toggleable()
+                    ->label('Posts Count')
+                    ->counts('posts')
+                    ->sortable()
+                    ->toggleable()
             ])
             ->filters([
                 //
@@ -63,7 +72,7 @@ class CategoryResource extends Resource
     {
         return [
             PostsRelationManager::class,
-       ];
+        ];
     }
 
     public static function getPages(): array

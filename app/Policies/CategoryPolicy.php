@@ -67,7 +67,7 @@ class CategoryPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function deleteAny(User $user, Category $category): bool
+    public function deleteAny(User $user): bool
     {
         return true;
     }
@@ -75,7 +75,7 @@ class CategoryPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restoreAny(User $user, Category $category): bool
+    public function restoreAny(User $user): bool
     {
         return true;
     }
@@ -83,7 +83,7 @@ class CategoryPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDeleteAny(User $user, Category $category): bool
+    public function forceDeleteAny(User $user): bool
     {
         return true;
     }
