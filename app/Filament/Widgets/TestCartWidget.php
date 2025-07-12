@@ -2,7 +2,10 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Post;
 use Filament\Widgets\ChartWidget;
+use Flowframe\Trend\Trend;
+use Flowframe\Trend\TrendValue;
 
 class TestCartWidget extends ChartWidget
 {
@@ -14,25 +17,27 @@ class TestCartWidget extends ChartWidget
 
     protected function getData(): array
     {
+        $data = Trend::model(Post::class)
+            ->between(
+                start: now()->subMonth(6),
+                end: now(),
+            )
+            ->perMonth()
+            ->count();
+
         return [
             'datasets' => [
                 [
                     'label' => 'Blog posts created',
-                    'data' => [ 21, 32, 45, 89],
-                    'backgroundColor' => [
-                        'rgba(255, 99, 132)',
-                        'rgba(75, 192, 192)',
-                        'rgba(54, 162, 235)',
-                        'rgba(255, 206, 86)',
-                    ]
+                    'data' => $data->map(fn (TrendValue $value) => $value->aggregate),
                 ],
             ],
-            'labels' => ['Red', 'Green', 'Blue', 'Yellow'],
+            'labels' => $data->map(fn (TrendValue $value) => $value->date),
         ];
     }
 
     protected function getType(): string
     {
-        return 'doughnut';
+        return 'line';
     }
 }
