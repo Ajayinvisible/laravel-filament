@@ -3,12 +3,16 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Post;
+use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
 class TestCartWidget extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?string $heading = 'Test Chart';
 
     protected int | string | array $columnSpan = 1;
@@ -17,10 +21,12 @@ class TestCartWidget extends ChartWidget
 
     protected function getData(): array
     {
+        $startDate = $this->filters['startDate'];
+        $endDate = $this->filters['endDate'];
         $data = Trend::model(Post::class)
             ->between(
-                start: now()->subMonth(6),
-                end: now(),
+                start: $startDate ? Carbon::parse($startDate) : now()->subMonth(6),
+                end: $endDate ? Carbon::parse($endDate) : now()->subMonth(6),
             )
             ->perMonth()
             ->count();
