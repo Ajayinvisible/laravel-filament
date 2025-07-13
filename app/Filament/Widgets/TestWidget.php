@@ -13,20 +13,22 @@ class TestWidget extends BaseWidget
     use InteractsWithPageFilters;
     protected function getStats(): array
     {
-        $startDate = $this->filters['startDate'];
-        $endDate = $this->filters['endDate'];
+        // $startDate = $this->filters['startDate'];
+        // $endDate = $this->filters['endDate'];
         return [
             Stat::make(
                 'New Users',
-                User::when(
-                    $startDate,
-                    fn($query) => $query->where('created_at', '>', $startDate)
-                )
-                    ->when(
-                        $endDate,
-                        fn($query) => $query->where('created_at', '<', $endDate)
-                    )
-                    ->count()
+                User::
+                    // when(
+                    //     $startDate,
+                    //     fn($query) => $query->where('created_at', '>', $startDate)
+                    // )
+                    //     ->when(
+                    //         $endDate,
+                    //         fn($query) => $query->where('created_at', '<', $endDate)
+                    //     )
+                    //     ->
+                    count()
             )
                 ->description('New users that have joined')
                 ->descriptionIcon('heroicon-s-user-group', IconPosition::Before)
